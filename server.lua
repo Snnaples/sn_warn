@@ -31,7 +31,7 @@ vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
           vRPclient.notify(sourceWarn,{"[~r~WARN~w~] Motivul nu poate sa fie gol!"})
         else
           MySQL.query("vRP/addWarn", {id = target})
-          TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. GetPlayerName(sourceWarn) .. " ^1i-a dat un warn lui ^0" .. GetPlayerName(sourceTarget) .. "\n ^1Motiv: ^0" .. warnReason)
+          TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a dat un warn lui ^0" .. GetPlayerName(sourceTarget) .. "\n ^1Motiv: ^0" .. warnReason)
         end
     end})
 end})
@@ -47,11 +47,11 @@ vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
 if target ~= nil then
 
  MySQL.query("vRP/removeWarn", {id = target})
- TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. GetPlayerName(sourceWarn) .. " ^1i-a scos un warn lui ^0" .. GetPlayerName(sourceTarget))
-  vRPclient.notify(sourceWarn,{"[~r~WARN~w~] I-ai scos un warn lui " .. GetPlayerName(sourceTarget)})
+ TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a scos un warn lui ^0" .. GetPlayerName(sourceTarget))
+  vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] I-ai scos un warn lui " .. GetPlayerName(sourceTarget)})
 
 else
-  vRPclient.notify(sourceWarn,{"[~r~WARN~w~] ID-ul nu este corect!"})
+  vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] ID-ul nu este corect!"})
 
 
     end
