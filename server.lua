@@ -1,62 +1,57 @@
 local Tunnel = module("vrp", "lib/Tunnel")
 local Proxy = module("vrp", "lib/Proxy")
 vRP = Proxy.getInterface("vRP")
-vRPclient = Tunnel.getInterface("vRP","vrp_warn")
-MySQL = module("vrp_mysql", "MySQL")
-MySQL.createCommand("vRP/addWarn","UPDATE vrp_users set warns = warns + 1 WHERE id = @id")
-MySQL.createCommand ("vRP/warnInit","ALTER TABLE `vrp_users` ADD IF NOT EXISTS `warns` INT NOT NULL")
-MySQL.createCommand("vRP/removeWarn", "UPDATE vrp_users SET warns = warns - 1 WHERE id = @id")
-MySQL.createCommand("vRP/checkWarns", "SELECT warns FROM vrp_users WHERE id = @id")
-MySQL.query("vRP/warnInit")
+vRPclient = Tunnel.getInterface("vRP","vrp_warn") 
 RegisterCommand("warns",function(source,args)
   local id = vRP.getUserId({source})
   local source2 = vRP.getUserSource({id})
-  MySQL.query("vRP/checkWarns", {id = id}, function(rows)
-    local warns = rows[1].warns
-    vRPclient.notify(source2, {"[~r~WARN~w~] Ai ~r~" .. warns .. " ~w~warnuri"})
+ exports['GHMattiMySQL']:QueryResultAsync("SELECT warns FROM vrp_users WHERE id = @id", {id = id}, function(rows)
+vRPclient.notify(source2, {"[~r~WARN~w~] Ai ~r~" .. rows[1].warns .. " ~w~warnuri"})
+
 end)
 end)
+
 local function ch_snnaplesWARNPLAYER(player,choice)
-   sourcePlayer = vRP.getUserSource({player})
-  user_id = vRP.getUserId({sourcePlayer})
-  playerName = GetPlayerName(sourcePlayer)
-vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
+   
+
+ user_id = vRP.getUserId({sourcePlayer})
+ sourcePlayer = vRP.getUserSource({user_id})
+ playerName = GetPlayerName(sourcePlayer)
+vRP.prompt(sourcePlayer,"ID:","", function(player,targetID)
    target = tonumber(targetID)
-   sourceTarget = vRP.getUserSource({target})
-   vRP.prompt({sourcePlayer,"Motiv Warn:","", function(player,warnReason1)
-     
-         sourceWarn = vRP.getUserSource({player})
+   sourceTarget = vRP.getUserSource(target)
+   
+   vRP.prompt(sourcePlayer,"Motiv Warn:","", function(player,warnReason1)
         warnReason = tostring(warnReason1)
         if warnReason == nil then
-          vRPclient.notify(sourceWarn,{"[~r~WARN~w~] Motivul nu poate sa fie gol!"})
+          vRPclient.notify(player,{"[~r~WARN~w~] Motivul nu poate sa fie gol!"})
         else
-          MySQL.query("vRP/addWarn", {id = target})
-          TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a dat un warn lui ^0" .. GetPlayerName(sourceTarget) .. "\n ^1Motiv: ^0" .. warnReason)
-        end
-    end})
-end})
+          exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns + 1 WHERE id = @id", {id = target}, function()
+           TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a dat un warn lui ^0" .. GetPlayerName(sourceTarget) .. "\n ^1Motiv: ^0" .. warnReason)
+           end)
+          end
+    end)
+end)
 end
 
 local function ch_snnaplesUNWARNPLAYER(player,choice)
-  sourcePlayer = vRP.getUserSource({player})
- user_id = vRP.getUserId({sourcePlayer})
+ 
+ user_id = vRP.getUserId({source})
+ sourcePlayer = vRP.getUserSource({user_idd})
  playerName = GetPlayerName(sourcePlayer)
 vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
   target = tonumber(targetID)
   sourceTarget = vRP.getUserSource({target})
 if target ~= nil then
-
- MySQL.query("vRP/removeWarn", {id = target})
+ exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns - 1 WHERE id = @id", {id = target}, function()end)
  TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a scos un warn lui ^0" .. GetPlayerName(sourceTarget))
-  vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] I-ai scos un warn lui " .. GetPlayerName(sourceTarget)})
-
+  vRPclient.notify(player,{"[~r~WARN~w~] I-ai scos un warn lui " .. GetPlayerName(sourceTarget)})
 else
-  vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] ID-ul nu este corect!"})
-
-
+  vRPclient.notify(player,{"[~r~WARN~w~] ID-ul nu este corect!"})
     end
 end})
 end
+
 local function ch_snnaplesWARN(player,choice)
   vRP.buildMenu({"⚠️ Warn", {player = player}, function(menu)
     menu.name = "⚠️ Warn"
@@ -68,6 +63,7 @@ local function ch_snnaplesWARN(player,choice)
   vRP.openMenu({player,menu})
 end})
 end
+
 vRP.registerMenuBuilder({"admin", function(add, data)
 local user_id = vRP.getUserId({data.player})
 if user_id ~= nil then
