@@ -14,7 +14,7 @@ end)
 local function ch_snnaplesWARNPLAYER(player,choice)
    
 
- user_id = vRP.getUserId({sourcePlayer})
+ user_id = vRP.getUserId({source})
  sourcePlayer = vRP.getUserSource({user_id})
  playerName = GetPlayerName(sourcePlayer)
 vRP.prompt(sourcePlayer,"ID:","", function(player,targetID)
@@ -37,7 +37,7 @@ end
 local function ch_snnaplesUNWARNPLAYER(player,choice)
  
  user_id = vRP.getUserId({source})
- sourcePlayer = vRP.getUserSource({user_idd})
+ sourcePlayer = vRP.getUserSource({user_id})
  playerName = GetPlayerName(sourcePlayer)
 vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
   target = tonumber(targetID)
