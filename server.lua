@@ -19,14 +19,16 @@ local function ch_snnaplesWARNPLAYER(player,choice)
  playerName = GetPlayerName(sourcePlayer)
 vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
    target = parseInt(targetID)
-   sourceTarget = vRP.getUserSource({target})
+   targetID = vRP.getUserId({target})
+   sourceTarget = vRP.getUserSource({targetID})
+  
    
    vRP.prompt({sourcePlayer,"Motiv Warn:","", function(player,warnReason1)
         warnReason = tostring(warnReason1)
         if warnReason == nil then
           vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] Motivul nu poate sa fie gol!"})
         else
-          exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns + 1 WHERE id = @id", {id = target}, function()
+          exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns + 1 WHERE id = @id", {id = targetID}, function()
            TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a dat un warn lui ^0" .. GetPlayerName(sourceTarget) .. "\n ^1Motiv: ^0" .. warnReason)
            end)
           end
@@ -43,10 +45,14 @@ vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
   target = parseInt(targetID)
   idSource = vRP.getUserId({target})
    sourceTarget = vRP.getUserSource({idSource})
+   targetID = vRP.getUserId({player})
 if target ~= nil then
- exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns - 1 WHERE id = @id", {id = target}, function()end)
- TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a scos un warn lui ^0" .. GetPlayerName(sourceTarget))
+ exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns - 1 WHERE id = @id", {id = targetID}, function()
+  TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a scos un warn lui ^0" .. GetPlayerName(sourceTarget))
   vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] I-ai scos un warn lui " .. GetPlayerName(sourceTarget)})
+
+end)
+
 else
   vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] ID-ul nu este corect!"})
     end
