@@ -12,23 +12,18 @@ end)
 end)
 
 local function ch_snnaplesWARNPLAYER(player,choice)
-   
-
   user_id = vRP.getUserId({player})
  sourcePlayer = vRP.getUserSource({user_id})
  playerName = GetPlayerName(sourcePlayer)
 vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
    target = parseInt(targetID)
-   targetID = vRP.getUserId({target})
-   sourceTarget = vRP.getUserSource({targetID})
-  
-   
+   sourceTarget = vRP.getUserSource({target})
    vRP.prompt({sourcePlayer,"Motiv Warn:","", function(player,warnReason1)
         warnReason = tostring(warnReason1)
         if warnReason == nil then
           vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] Motivul nu poate sa fie gol!"})
         else
-          exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns + 1 WHERE id = @id", {id = targetID}, function()
+          exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns + 1 WHERE id = @id", {id = target}, function()
            TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a dat un warn lui ^0" .. GetPlayerName(sourceTarget) .. "\n ^1Motiv: ^0" .. warnReason)
            end)
           end
@@ -43,11 +38,11 @@ local function ch_snnaplesUNWARNPLAYER(player,choice)
  playerName = GetPlayerName(sourcePlayer)
 vRP.prompt({sourcePlayer,"ID:","", function(player,targetID)
   target = parseInt(targetID)
-  idSource = vRP.getUserId({target})
-   sourceTarget = vRP.getUserSource({idSource})
-   targetID = vRP.getUserId({player})
+
+   sourceTarget = vRP.getUserSource({target})
+  
 if target ~= nil then
- exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns - 1 WHERE id = @id", {id = targetID}, function()
+ exports['GHMattiMySQL']:QueryAsync("UPDATE vrp_users SET warns = warns - 1 WHERE id = @id", {id = target}, function()
   TriggerClientEvent("chatMessage", -1,"[^1WARN^0] Adminul " .. playerName .. " ^1i-a scos un warn lui ^0" .. GetPlayerName(sourceTarget))
   vRPclient.notify(sourcePlayer,{"[~r~WARN~w~] I-ai scos un warn lui " .. GetPlayerName(sourceTarget)})
 
